@@ -1,0 +1,106 @@
+{
+  "name": "@appliedrec/react-native-plugin-ver-id",
+  "version": "0.1.0",
+  "description": "description",
+  "main": "lib/commonjs/index",
+  "module": "lib/module/index",
+  "types": "lib/typescript/src/index.d.ts",
+  "react-native": "src/index",
+  "source": "src/index",
+  "files": [
+    "src",
+    "lib",
+    "android",
+    "ios",
+    "cpp",
+    "tests",
+    "appliedrec-react-native-plugin-ver-id.podspec",
+    "!lib/typescript/example",
+    "!**/__fixtures__",
+    "!**/__mocks__"
+  ],
+  "scripts": {
+    "typescript": "tsc --noEmit",
+    "lint": "eslint \"**/*.{js,ts,tsx}\"",
+    "prepare": "bob build",
+    "build": "yarn lint && yarn typescript && yarn prepare"
+  },
+  "keywords": [
+    "react-native",
+    "ios",
+    "android"
+  ],
+  "repository": "https://github.com/vsecades/Ver-ID-React-Native",
+  "author": "applied recognition",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vsecades/Ver-ID-React-Native/issues"
+  },
+  "homepage": "https://github.com/vsecades/Ver-ID-React-Native#readme",
+  "devDependencies": {
+    "@react-native-community/bob": "^0.16.2",
+    "@react-native-community/eslint-config": "^2.0.0",
+    "@types/react": "^16.9.19",
+    "@types/react-native": "0.62.13",
+    "eslint": "^7.4.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "pod-install": "^0.1.0",
+    "prettier": "^2.0.5",
+    "react": "16.11.0",
+    "react-native": "0.62.2",
+    "typescript": "^3.8.3"
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*"
+  },
+  "eslintConfig": {
+    "extends": [
+      "@react-native-community",
+      "prettier"
+    ],
+    "rules": {
+      "prettier/prettier": [
+        "error",
+        {
+          "quoteProps": "consistent",
+          "singleQuote": true,
+          "tabWidth": 2,
+          "trailingComma": "es5",
+          "useTabs": false
+        }
+      ]
+    }
+  },
+  "eslintIgnore": [
+    "node_modules/",
+    "lib/",
+    "tests/api/"
+  ],
+  "prettier": {
+    "quoteProps": "consistent",
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "es5",
+    "useTabs": false
+  },
+  "@react-native-community/bob": {
+    "source": "src",
+    "output": "lib",
+    "targets": [
+      "commonjs",
+      "module",
+      "typescript"
+    ]
+  },
+  "dependencies": {
+    "@types/lodash": "^4.14.157",
+    "@types/react-redux": "^7.1.9",
+    "@types/redux-logger": "^3.0.8",
+    "lodash": "^4.17.19",
+    "react-redux": "^7.2.0",
+    "redux": "^4.0.5",
+    "redux-logger": "^3.0.6"
+  }
+}
