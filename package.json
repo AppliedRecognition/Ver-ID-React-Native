@@ -40,8 +40,12 @@
   "devDependencies": {
     "@react-native-community/bob": "^0.16.2",
     "@react-native-community/eslint-config": "^2.0.0",
+    "@types/jasmine": "^3.5.11",
+    "@types/lodash": "^4.14.158",
     "@types/react": "^16.9.19",
     "@types/react-native": "0.62.13",
+    "@types/react-redux": "^7.1.9",
+    "@types/redux-logger": "^3.0.8",
     "eslint": "^7.4.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.4",
@@ -66,7 +70,8 @@
         {
           "quoteProps": "consistent",
           "singleQuote": true,
-          "tabWidth": 2,
+          "printWidth": 100,
+          "tabWidth": 4,
           "trailingComma": "es5",
           "useTabs": false
         }
@@ -81,7 +86,8 @@
   "prettier": {
     "quoteProps": "consistent",
     "singleQuote": true,
-    "tabWidth": 2,
+    "printWidth": 100,
+    "tabWidth": 4,
     "trailingComma": "es5",
     "useTabs": false
   },
@@ -95,9 +101,6 @@
     ]
   },
   "dependencies": {
-    "@types/lodash": "^4.14.157",
-    "@types/react-redux": "^7.1.9",
-    "@types/redux-logger": "^3.0.8",
     "lodash": "^4.17.19",
     "react-redux": "^7.2.0",
     "redux": "^4.0.5",

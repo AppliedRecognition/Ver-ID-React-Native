@@ -24,17 +24,17 @@ export { SessionResult } from './classes/SessionResult';
  * ```
  */
 export function load(password?: string): Promise<VerID> {
-  return new Promise<VerID>((resolve, reject) => {
-    const resolveFn = () => {
-      var verid = new VerID();
-      resolve(verid);
-    };
-    if (password !== undefined) {
-      PluginVerId.loadWithPassword(password).then(resolveFn).catch(reject);
-    } else {
-      PluginVerId.load().then(resolveFn).catch(reject);
-    }
-  });
+    return new Promise<VerID>((resolve, reject) => {
+        const resolveFn = () => {
+            var verid = new VerID();
+            resolve(verid);
+        };
+        if (password !== undefined) {
+            PluginVerId.loadWithPassword(password).then(resolveFn).catch(reject);
+        } else {
+            PluginVerId.load().then(resolveFn).catch(reject);
+        }
+    });
 }
 
 /**
@@ -42,18 +42,18 @@ export function load(password?: string): Promise<VerID> {
  * @returns Promise
  */
 export function unload(): Promise<void> {
-  return PluginVerId.unload();
+    return PluginVerId.unload();
 }
 /**
  * Set testing mode
  * @param mode used to set the testing mode on or off
  */
 export function setTestingMode(mode: boolean): Promise<void> {
-  return new Promise<void>((resolve, reject) => {
-    if (typeof mode === 'boolean') {
-      PluginVerId.setTestingMode(mode).then(resolve).catch(reject);
-    } else {
-      reject('Invalid Parameter');
-    }
-  });
+    return new Promise<void>((resolve, reject) => {
+        if (typeof mode === 'boolean') {
+            PluginVerId.setTestingMode(mode).then(resolve).catch(reject);
+        } else {
+            reject('Invalid Parameter');
+        }
+    });
 }
