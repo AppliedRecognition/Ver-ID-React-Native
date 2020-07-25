@@ -32,7 +32,6 @@ export default function (VerIDPlugin: VerIdPluginSpec) {
                 expect(typeof VerIDPlugin.unload).toBe('function');
                 expect(typeof VerIDPlugin.AuthenticationSessionSettings).toBe('function');
                 expect(typeof VerIDPlugin.DetectedFace).toBe('function');
-                console.log('Error', typeof VerIDPlugin.Error);
                 expect(typeof VerIDPlugin.Error).toBe('function');
                 expect(typeof VerIDPlugin.Face).toBe('function');
                 expect(typeof VerIDPlugin.FaceComparisonResult).toBe('function');

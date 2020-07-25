@@ -22,6 +22,7 @@ export default {
 
         // Helper function for adding test results to the state tree
         function emitResult(text: any, classes: any[] = []) {
+            console.log('[emiting result]');
             console.log(text);
             store.dispatch({
                 type: 'ADD_TESTS',
@@ -39,18 +40,12 @@ export default {
                 store.dispatch({ type: 'SET_TESTING', payload: true });
             },
             suiteStarted: function (result: any) {
-                console.log('[suiteStarted]');
-                console.table(result);
                 emitResult(result.fullName, ['suite_started']);
             },
             specStarted: function (result: any) {
-                console.log('[specStarted]');
-                console.table(result);
                 emitResult(result.fullName, ['spec_started']);
             },
             specDone: function (result: any) {
-                console.log('[specDone]');
-                console.table(result);
                 var spec_class = 'empty';
                 if (
                     result.passedExpectations.length > 0 &&
