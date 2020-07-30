@@ -3,12 +3,7 @@ import ReactNativePluginVerId from '@appliedrec/react-native-plugin-ver-id';
 import { showErrorAlert, showSuccessAlert } from './components/utils';
 import type { Face } from '../src/classes/Face';
 import type { FaceTemplate } from '../src/classes/FaceTemplate';
-
-type Attachment = {
-    recognizableFace: Face;
-    bearing: string;
-    image: string;
-};
+import type { DetectedFace } from '../src/classes/DetectedFace';
 
 const validateProperty = (object: any, property: string, expectedType: string) => {
     let isValid =
@@ -19,7 +14,7 @@ const validateProperty = (object: any, property: string, expectedType: string) =
     if (!isValid) {
         console.warn(
             'is property valid?, property:',
-            Object.keys(object)[0],
+            property,
             'valid:',
             isValid,
             'value:',
@@ -29,7 +24,7 @@ const validateProperty = (object: any, property: string, expectedType: string) =
     return isValid;
 };
 
-const verifyIfAttachmentIsCorrect = (attachment: Attachment) => {
+const verifyIfAttachmentIsCorrect = (attachment: DetectedFace) => {
     let isValid =
         attachment &&
         validateProperty(attachment, 'recognizableFace', 'object') &&
@@ -115,13 +110,13 @@ export const captureLiveFace = async (instance: VerID, singlePose?: boolean, sho
                 } else if (!response.error) {
                     if (response.attachments.length > 0) {
                         let faces = response.attachments
-                            .filter((attachment: Attachment) => {
+                            .filter((attachment: DetectedFace) => {
                                 return (
                                     verifyIfAttachmentIsCorrect(attachment) &&
                                     attachment.bearing === ReactNativePluginVerId.Bearing.STRAIGHT
                                 );
                             })
-                            .map((attachment: Attachment) => {
+                            .map((attachment: DetectedFace) => {
                                 return attachment.recognizableFace;
                             });
                         showSuccessAlert('Faces attachment are correct!');
@@ -136,6 +131,24 @@ export const captureLiveFace = async (instance: VerID, singlePose?: boolean, sho
             })
             .catch((error) => {
                 showErrorAlert('Capture Live Face, unknown error!', error);
+            });
+    }
+};
+
+export const deleteRegisteredUser = async (instance: VerID, userID: string) => {
+    if (instance) {
+        return instance
+            .deleteRegisteredUser(userID)
+            .then((response: any) => {
+                if (!response.error) {
+                    showSuccessAlert(`Delete of ${userID} Completed!`);
+                } else {
+                    showErrorAlert('Error deleting user!', response.error);
+                }
+                return response;
+            })
+            .catch((error: any) => {
+                showErrorAlert('Delete User, unknown error!', error);
             });
     }
 };

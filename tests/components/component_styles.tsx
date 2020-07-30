@@ -1,7 +1,7 @@
 'use strict';
 var component_styles = {
     resultsContainer: {
-        maxHeight: '70%',
+        maxHeight: '80%',
         paddingBottom: 10,
         paddingTop: 20,
     },
@@ -40,6 +40,7 @@ var component_styles = {
         paddingTop: 5,
         paddingRight: 5,
         paddingBottom: 5,
+        fontSize: 15
     },
     passed: {
         backgroundColor: '#0FDB20',

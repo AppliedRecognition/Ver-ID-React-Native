@@ -4,7 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import ReactNativePluginVerId from '@appliedrec/react-native-plugin-ver-id';
 import type { VerID } from '../../src/classes/VerID';
 import { createButton } from './utils';
-import { registerUser, captureLiveFace } from '../LiveTests';
+import { registerUser, captureLiveFace, deleteRegisteredUser } from '../LiveTests';
 
 type initialState = {
     instance?: VerID;
@@ -51,10 +51,18 @@ class TestLiveComponent extends Component<{}, initialState> {
         return faces;
     };
 
+    deleteUser = async () => {
+        let instance = await this.getInstance();
+        if (instance) {
+            await deleteRegisteredUser(instance, this.state.USER_ID);
+        }
+    }
+
     mapActions = () => {
         let actions: Array<any> = [
             { title: 'register User', action: this.registerUser },
             { title: 'Capture live Face', action: this.captureLiveFace },
+            { title: 'Delete User', action: this.deleteUser },
         ];
 
         return actions;

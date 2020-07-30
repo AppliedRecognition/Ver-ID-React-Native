@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import TestRunnerComponent from './TestRunnerComponent';
 import ReactNativePluginVerId from '@appliedrec/react-native-plugin-ver-id';
 
-class TestMainComponent extends Component<{ verid: any }, { verid: any }> {
+class TestMainComponent extends Component {
     constructor(props: any) {
         super(props);
     }

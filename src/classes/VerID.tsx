@@ -58,6 +58,10 @@ export class VerID {
      */
     deleteRegisteredUser(userId: string): Promise<void> {
         return new Promise<void>((resolve, reject) => {
+            if (!userId) {
+                reject('Invalid userId');
+                return;
+            }
             PluginVerId.deleteUser(userId).then(decodeResult(resolve)).catch(reject);
         });
     }
@@ -97,8 +101,13 @@ export function decodeResult<T>(callback: (result?: T) => void) {
     return (encoded?: string) => {
         if (encoded) {
             if (typeof encoded === 'string') {
-                var decoded = JSON.parse(encoded);
-                callback(decoded);
+                try {
+                    var decoded = JSON.parse(encoded);
+                    callback(decoded);
+                } catch (e) {
+                    // @ts-ignore
+                    callback(encoded);
+                }
             } else {
                 callback(encoded);
             }

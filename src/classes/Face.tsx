@@ -32,6 +32,18 @@ export class Face {
      */
     roll: number = 0;
     /**
+     * leftEye
+     */
+    leftEye: Array<number> = [];
+    /**
+     * Data used for face recognition
+     */
+    data: string = '';
+    /**
+     * rightEye
+     */
+    rightEye: Array<number> = [];
+    /**
      * Quality of the face landmarks (10 maximum)
      */
     quality: number = 0;

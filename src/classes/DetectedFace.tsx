@@ -7,7 +7,7 @@ export class DetectedFace {
     /**
      * Detected face
      */
-    face: Face = new Face();
+    recognizableFace: Face = new Face();
     /**
      * Detected face bearing
      */
