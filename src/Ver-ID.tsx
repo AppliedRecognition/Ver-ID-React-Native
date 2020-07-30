@@ -9,6 +9,8 @@ export { Face } from './classes/Face';
 export { FaceComparisonResult } from './classes/FaceComparisonResult';
 export { FaceTemplate } from './classes/FaceTemplate';
 export { SessionResult } from './classes/SessionResult';
+export { Bearing } from './classes/Bearing';
+
 /**
  * Load Ver-ID
  * @param password Ver-ID API password (if omitted the library will look in the app's plist (iOS) or manifest (Android))

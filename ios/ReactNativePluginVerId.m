@@ -2,9 +2,6 @@
 
 @interface RCT_EXTERN_MODULE(ReactNativePluginVerId, NSObject)
 
-RCT_EXTERN_METHOD(multiply:(float)a withB:(float)b
-                 withResolver:(RCTPromiseResolveBlock)resolve
-                 withRejecter:(RCTPromiseRejectBlock)reject)
                  
 RCT_EXTERN_METHOD(loadWithPassword: (NSString*)password
                   resolver: (RCTPromiseResolveBlock)resolve
@@ -20,15 +17,15 @@ RCT_EXTERN_METHOD(setTestingMode: (BOOL)mode
                   resolver: (RCTPromiseResolveBlock)resolve
                   rejecter: (RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(registerUser: (NSString*)settingsConfig
+RCT_EXTERN_METHOD(registerUser: (NSArray*)settingsConfig
                   resolver: (RCTPromiseResolveBlock)resolve
                   rejecter: (RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(authenticate: (NSString*)settingsConfig
+RCT_EXTERN_METHOD(authenticate: (NSArray*)settingsConfig
                   resolver: (RCTPromiseResolveBlock)resolve
                   rejecter: (RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(captureLiveFace: (NSString*)settingsConfig
+RCT_EXTERN_METHOD(captureLiveFace: (NSArray*)settingsConfig
                   resolver: (RCTPromiseResolveBlock)resolve
                   rejecter: (RCTPromiseRejectBlock)reject)
 

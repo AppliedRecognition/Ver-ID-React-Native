@@ -1,5 +1,5 @@
 import { VerIDSessionSettings } from './VerIDSessionSettings';
-import { Bearing } from './enums';
+import { Bearing } from './Bearing';
 /**
  * Settings for registration sessions
  */

@@ -68,12 +68,14 @@
       "prettier/prettier": [
         "error",
         {
-          "quoteProps": "consistent",
-          "singleQuote": true,
-          "printWidth": 100,
-          "tabWidth": 4,
-          "trailingComma": "es5",
-          "useTabs": false
+            "quoteProps": "consistent",
+            "Semicolons": true,
+            "jsxBracketSameLine": true,
+            "singleQuote": true,
+            "printWidth": 110,
+            "tabWidth": 4,
+            "trailingComma": "es5",
+            "useTabs": false
         }
       ]
     }
@@ -84,12 +86,14 @@
     "tests/api/"
   ],
   "prettier": {
-    "quoteProps": "consistent",
-    "singleQuote": true,
-    "printWidth": 100,
-    "tabWidth": 4,
-    "trailingComma": "es5",
-    "useTabs": false
+      "quoteProps": "consistent",
+      "Semicolons": true,
+      "jsxBracketSameLine": true,
+      "singleQuote": true,
+      "printWidth": 110,
+      "tabWidth": 4,
+      "trailingComma": "es5",
+      "useTabs": false
   },
   "@react-native-community/bob": {
     "source": "src",

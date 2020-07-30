@@ -1,4 +1,4 @@
-import { Bearing } from './enums';
+import { Bearing } from './Bearing';
 import { Face } from './Face';
 /**
  * Face detected during a session

@@ -1,4 +1,3 @@
-/*global globalThis*/
 'use strict';
 const jasmineRequire = require('./api/jasmine');
 import VerIDTests from './tests';
@@ -16,9 +15,8 @@ export default {
             for (var property in source) destination[property] = source[property];
             return destination;
         }
-        let global: any = globalThis;
 
-        extend(global.window, jasmineInterface);
+        extend(window, jasmineInterface);
 
         // Helper function for adding test results to the state tree
         function emitResult(text: any, classes: any[] = []) {
@@ -47,10 +45,7 @@ export default {
             },
             specDone: function (result: any) {
                 var spec_class = 'empty';
-                if (
-                    result.passedExpectations.length > 0 &&
-                    result.failedExpectations.length === 0
-                ) {
+                if (result.passedExpectations.length > 0 && result.failedExpectations.length === 0) {
                     // There were some passes and no failures
                     spec_class = 'passed';
                 } else if (result.failedExpectations.length > 0) {
@@ -67,9 +62,7 @@ export default {
                     [spec_class, 'spec_done']
                 );
                 for (var i = 0; i < result.failedExpectations.length; i++) {
-                    emitResult('Failure: ' + result.failedExpectations[i].message, [
-                        'failure_detail',
-                    ]);
+                    emitResult('Failure: ' + result.failedExpectations[i].message, ['failure_detail']);
                     // We can use the error stack too if we want :
                     // result.failedExpectations[i].stack
                 }

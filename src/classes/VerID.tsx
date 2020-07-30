@@ -16,9 +16,8 @@ export class VerID {
      */
     register(settings: RegistrationSessionSettings): Promise<SessionResult> {
         return new Promise<SessionResult>((resolve, reject) => {
-            PluginVerId.registerUser(JSON.stringify(settings))
-                .then(decodeResult(resolve))
-                .catch(reject);
+            let options = [{ settings: JSON.stringify(settings) }];
+            PluginVerId.registerUser(options).then(decodeResult(resolve)).catch(reject);
         });
     }
 
@@ -28,9 +27,8 @@ export class VerID {
      */
     authenticate(settings: AuthenticationSessionSettings): Promise<SessionResult> {
         return new Promise<SessionResult>((resolve, reject) => {
-            PluginVerId.authenticate(JSON.stringify(settings))
-                .then(decodeResult(resolve))
-                .catch(reject);
+            let options = [{ settings: JSON.stringify(settings) }];
+            PluginVerId.authenticate(options).then(decodeResult(resolve)).catch(reject);
         });
     }
 
@@ -40,9 +38,8 @@ export class VerID {
      */
     captureLiveFace(settings: LivenessDetectionSessionSettings): Promise<SessionResult> {
         return new Promise<SessionResult>((resolve, reject) => {
-            PluginVerId.captureLiveFace(JSON.stringify(settings))
-                .then(decodeResult(resolve))
-                .catch(reject);
+            let options = [{ settings: JSON.stringify(settings) }];
+            PluginVerId.captureLiveFace(options).then(decodeResult(resolve)).catch(reject);
         });
     }
 
