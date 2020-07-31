@@ -31,7 +31,7 @@ export function load(password?: string): Promise<VerID> {
             var verid = new VerID();
             resolve(verid);
         };
-        if (password !== undefined) {
+        if (password) {
             PluginVerId.loadWithPassword(password).then(resolveFn).catch(reject);
         } else {
             PluginVerId.load().then(resolveFn).catch(reject);
