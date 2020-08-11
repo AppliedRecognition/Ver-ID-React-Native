@@ -1,4 +1,4 @@
-import ReactNativePluginVerid from './imports'
+import ReactNativePluginVerid from './imports';
 
 const TestMainComponent = require('../tests/components/TestMainComponent');
 const LiveTest = require('../tests/components/TestLiveComponent');

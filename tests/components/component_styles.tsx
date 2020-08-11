@@ -40,7 +40,7 @@ var component_styles = {
         paddingTop: 5,
         paddingRight: 5,
         paddingBottom: 5,
-        fontSize: 15
+        fontSize: 15,
     },
     passed: {
         backgroundColor: '#0FDB20',

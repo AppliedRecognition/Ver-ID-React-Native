@@ -21,9 +21,10 @@
   ],
   "scripts": {
     "typescript": "tsc --noEmit",
-    "lint": "eslint \"**/*.{js,ts,tsx}\"",
+    "lint": "eslint \"**/*.{js,ts,tsx}\" --fix",
     "prepare": "bob build",
-    "build": "yarn lint && yarn typescript && yarn prepare"
+    "build-project": "yarn && yarn lint && yarn typescript",
+    "build": "node scripts/build.js"
   },
   "keywords": [
     "react-native",
@@ -68,14 +69,14 @@
       "prettier/prettier": [
         "error",
         {
-            "quoteProps": "consistent",
-            "Semicolons": true,
-            "jsxBracketSameLine": true,
-            "singleQuote": true,
-            "printWidth": 110,
-            "tabWidth": 4,
-            "trailingComma": "es5",
-            "useTabs": false
+          "quoteProps": "consistent",
+          "Semicolons": true,
+          "jsxBracketSameLine": true,
+          "singleQuote": true,
+          "printWidth": 110,
+          "tabWidth": 4,
+          "trailingComma": "es5",
+          "useTabs": false
         }
       ]
     }
@@ -86,14 +87,14 @@
     "tests/api/"
   ],
   "prettier": {
-      "quoteProps": "consistent",
-      "Semicolons": true,
-      "jsxBracketSameLine": true,
-      "singleQuote": true,
-      "printWidth": 110,
-      "tabWidth": 4,
-      "trailingComma": "es5",
-      "useTabs": false
+    "quoteProps": "consistent",
+    "Semicolons": true,
+    "jsxBracketSameLine": true,
+    "singleQuote": true,
+    "printWidth": 110,
+    "tabWidth": 4,
+    "trailingComma": "es5",
+    "useTabs": false
   },
   "@react-native-community/bob": {
     "source": "src",
@@ -105,6 +106,7 @@
     ]
   },
   "dependencies": {
+    "inquirer": "^7.3.3",
     "lodash": "^4.17.19",
     "react-redux": "^7.2.0",
     "redux": "^4.0.5",
