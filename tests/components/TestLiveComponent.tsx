@@ -25,8 +25,8 @@ class TestLiveComponent extends Component<{}, initialState> {
 
     getInstance = async () => {
         if (!this.instanceExist()) {
-            let instance = await ReactNativePluginVerId.load('12');
-            this.setState({ instance: undefined });
+            let instance = await ReactNativePluginVerId.load();
+            this.setState({ instance: instance });
             return instance;
         } else {
             return this.state.instance;
