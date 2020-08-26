@@ -14,7 +14,11 @@ var component_styles = {
         padding: 10,
     },
     button: {
-        height: 50,
+        minHeight: 40,
+        maxHeight: 80,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 15,
         backgroundColor: '#48BBEC',
         alignSelf: 'stretch',
         marginTop: 10,
@@ -29,8 +33,10 @@ var component_styles = {
     },
     buttonText: {
         fontSize: 22,
+        flexWrap: 'wrap',
         color: '#FFF',
         alignSelf: 'center',
+        textAlign: 'center',
     },
     suite_started: {
         fontWeight: 'bold',

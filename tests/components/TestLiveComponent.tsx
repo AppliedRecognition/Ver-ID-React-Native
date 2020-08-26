@@ -1,10 +1,18 @@
 'use strict';
 import React, { Component } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import ReactNativePluginVerId from '../../src/imports';
 import type { VerID } from '../../src/classes/VerID';
-import { createButton } from './utils';
-import { registerUser, captureLiveFace, deleteRegisteredUser } from '../LiveTests';
+import { createButton, showErrorAlert, showSuccessAlert, errorhandler } from './utils';
+import {
+    registerUser,
+    captureLiveFace,
+    deleteRegisteredUser,
+    compareFaces,
+    detectFaceInImage,
+    authenticate,
+} from '../LiveTests';
+import type { Face } from '../../src/Ver-ID';
 
 type initialState = {
     instance?: VerID;
@@ -33,37 +41,96 @@ class TestLiveComponent extends Component<{}, initialState> {
         }
     };
 
-    registerUser = async () => {
-        let instance = await this.getInstance(),
-            response;
-        if (instance) {
-            response = registerUser(instance, this.state.USER_ID);
-        }
-        return response;
-    };
-
-    captureLiveFace = async () => {
-        let instance = await this.getInstance(),
-            faces;
-        if (instance) {
-            faces = await captureLiveFace(instance);
-        }
-        return faces;
-    };
-
-    deleteUser = async () => {
+    registerUser = async (showResult?: boolean) => {
         let instance = await this.getInstance();
         if (instance) {
-            await deleteRegisteredUser(instance, this.state.USER_ID);
+            registerUser(instance, this.state.USER_ID, showResult)
+                .catch(errorhandler)
+                .finally(deleteRegisteredUser.bind(this, instance, this.state.USER_ID));
+        } else {
+            showErrorAlert('Error, getting the instance');
+        }
+    };
+
+    registerUserAuthenticate = async () => {
+        let instance = await this.getInstance();
+        if (instance) {
+            registerUser(instance, this.state.USER_ID)
+                .then(authenticate.bind(this, instance, this.state.USER_ID))
+                .catch(errorhandler)
+                .finally(deleteRegisteredUser.bind(this, instance, this.state.USER_ID));
+        } else {
+            showErrorAlert('Error, getting the instance');
+        }
+    };
+
+    captureLiveFaceAndCompare = async () => {
+        let instance = await this.getInstance();
+        if (instance) {
+            var faces: any[];
+            captureLiveFace(instance)
+                .then((facesResult) => {
+                    if (!facesResult) {
+                        showErrorAlert('session canceled!');
+                        return;
+                    }
+
+                    faces = facesResult;
+                    return showSuccessAlert('Faces captured!, continue with single pose face capturing? ');
+                })
+                .then(captureLiveFace.bind(this, instance, true))
+                .then((facesResult) => {
+                    if (!facesResult) {
+                        showErrorAlert('session canceled!');
+                        return;
+                    }
+
+                    faces = facesResult;
+                    return showSuccessAlert('Faces captured!, continue with faces comparison?').then(() => {
+                        if (instance) return compareFaces(instance, faces[0], facesResult[0]);
+                        return;
+                    });
+                })
+                .catch(errorhandler);
+        }
+    };
+
+    detectFaceInSample = async () => {
+        let instance = await this.getInstance();
+        if (instance) {
+            var face1: Face;
+            captureLiveFace(instance)
+                .then((facesResult) => {
+                    if (!facesResult) {
+                        showErrorAlert('session canceled!');
+                        return;
+                    }
+
+                    face1 = facesResult[0];
+                    return showSuccessAlert('Faces captured!, continue with Detect Face In Image? ');
+                })
+                .then(detectFaceInImage.bind(this, instance))
+                .then((face2) => {
+                    if (!face2) {
+                        showErrorAlert('Error! Face not returned.');
+                        return;
+                    }
+                    return showSuccessAlert('Faces captured!, continue with faces comparison?').then(() => {
+                        if (instance) return compareFaces(instance, face1, face2);
+                        return;
+                    });
+                })
+                .catch(errorhandler);
         }
     };
 
     mapActions = () => {
         let actions: Array<any> = [
             { title: 'register User', action: this.registerUser },
-            { title: 'Capture live Face', action: this.captureLiveFace },
-            { title: 'Delete User', action: this.deleteUser },
-            { title: 'load', action: this.getInstance },
+            { title: 'Register user Show result', action: this.registerUser.bind(this, true) },
+            { title: 'Register user and Authenticate', action: this.registerUserAuthenticate },
+            { title: 'Capture Live Face and compare', action: this.captureLiveFaceAndCompare },
+            { title: 'Detect Face in Sample Image and compare', action: this.detectFaceInSample },
         ];
 
         return actions;
@@ -72,9 +139,11 @@ class TestLiveComponent extends Component<{}, initialState> {
     render() {
         return (
             <View style={styles.container}>
-                {this.mapActions().map((action: any, index: number) => {
-                    return createButton(action.title, action.action, index);
-                })}
+                <ScrollView>
+                    {this.mapActions().map((action: any, index: number) => {
+                        return createButton(action.title, action.action, index);
+                    })}
+                </ScrollView>
             </View>
         );
     }

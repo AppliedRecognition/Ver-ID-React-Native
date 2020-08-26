@@ -22,12 +22,17 @@ export const alert = (
         {
             text: !callbacks || (callbacks && !callbacks.successCallback) ? 'Close' : 'Cancel',
             onPress: () =>
-                callbacks && callbacks.cancelCallback ? callbacks.cancelCallback : console.log('Canceled!'),
+                callbacks && callbacks.cancelCallback ? callbacks.cancelCallback() : console.log('Canceled!'),
             style: callbacks ? {} : 'cancel',
         },
     ];
     if (callbacks && callbacks.successCallback) {
-        options.push({ text: 'OK', onPress: () => callbacks.successCallback });
+        options.push({
+            text: 'OK',
+            onPress: () => {
+                if (typeof callbacks.successCallback === 'function') callbacks.successCallback();
+            },
+        });
     }
 
     Alert.alert(title, description, options, { cancelable: true });
@@ -40,6 +45,12 @@ export const showErrorAlert = (message: string, error?: any) => {
     }
 };
 
-export const showSuccessAlert = (description: any, callback?: Function) => {
-    alert('Success', description, { successCallback: callback });
+export const showSuccessAlert = (description: any) => {
+    return new Promise<any>((resolve, reject) => {
+        alert('Success', description, { successCallback: resolve, cancelCallback: reject });
+    });
+};
+
+export const errorhandler = (error: any) => {
+    console.error(error);
 };

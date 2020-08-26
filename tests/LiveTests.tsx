@@ -4,6 +4,8 @@ import { showErrorAlert, showSuccessAlert } from './components/utils';
 import type { Face } from '../src/classes/Face';
 import type { FaceTemplate } from '../src/classes/FaceTemplate';
 import type { DetectedFace } from '../src/classes/DetectedFace';
+import { FACE_TEST_IMAGE } from './fixtures/face';
+import type { FaceComparisonResult, SessionResult } from '../src/Ver-ID';
 
 const validateProperty = (object: any, property: string, expectedType: string) => {
     let isValid =
@@ -69,25 +71,60 @@ export const registerUser = async (instance: VerID, userID: string, showResult?:
     var settings = new ReactNativePluginVerId.RegistrationSessionSettings(userID);
     settings.showResult = showResult ? showResult : false;
 
-    if (instance) {
-        return instance
-            .register(settings)
-            .then((response: any) => {
-                if (!response) {
-                    showErrorAlert('Registration Canceled');
-                    return;
-                }
-                if (!response.error) {
-                    showSuccessAlert('Registration Completed!');
-                } else {
-                    showErrorAlert('Error capturing Face!', response.error);
-                }
-                return response;
-            })
-            .catch((error: any) => {
-                showErrorAlert('Register, unknown error!', error);
-            });
-    }
+    return new Promise<SessionResult | void>((resolve, reject) => {
+        if (instance) {
+            instance
+                .register(settings)
+                .then((response: any) => {
+                    if (!response) {
+                        throw new Error('Registration Canceled');
+                    }
+                    if (!response.error) {
+                        showSuccessAlert('Registration Completed!').then(() => {
+                            resolve(response);
+                        });
+                    } else {
+                        showErrorAlert('Error capturing Face!', response.error);
+                        reject(response.error);
+                    }
+                })
+                .catch((error: any) => {
+                    showErrorAlert('Register, unknown error!', error);
+                    reject(error);
+                });
+        } else {
+            reject('Instance not found!');
+        }
+    });
+};
+
+export const authenticate = async (instance: VerID, userID: string) => {
+    return new Promise<SessionResult | void>((resolve, reject) => {
+        if (instance) {
+            var settings = new ReactNativePluginVerId.AuthenticationSessionSettings(userID);
+            instance
+                .authenticate(settings)
+                .then((response) => {
+                    if (!response) {
+                        throw new Error('Authentication Canceled');
+                    }
+                    if (!response.error) {
+                        showSuccessAlert('Authentication Completed!').then(() => {
+                            resolve(response);
+                        });
+                    } else {
+                        showErrorAlert('Error capturing Face!', response.error);
+                        reject(response.error);
+                    }
+                })
+                .catch((error) => {
+                    showErrorAlert('Authenticate, unknown error!', error);
+                    reject(error);
+                });
+        } else {
+            reject('Instance not found!');
+        }
+    });
 };
 
 export const captureLiveFace = async (instance: VerID, singlePose?: boolean, showResult?: boolean) => {
@@ -119,18 +156,65 @@ export const captureLiveFace = async (instance: VerID, singlePose?: boolean, sho
                             .map((attachment: DetectedFace) => {
                                 return attachment.recognizableFace;
                             });
-                        showSuccessAlert('Faces attachment are correct!');
-                        return faces;
+                        return showSuccessAlert('Faces attachment are correct!').then(() => {
+                            return faces;
+                        });
                     } else {
                         showErrorAlert('Error retrieving the faces!', response.error);
+                        throw new Error('Error retrieving the faces!');
                     }
                 } else {
                     showErrorAlert('Session Error, error capturing face!', response.error);
+                    throw new Error('Session Error, error capturing face!');
                 }
-                return response;
             })
             .catch((error) => {
                 showErrorAlert('Capture Live Face, unknown error!', error);
+                throw error;
+            });
+    }
+};
+
+export const compareFaces = async (instance: VerID, Face1: Face, Face2: Face) => {
+    return new Promise<FaceComparisonResult | void>((resolve, reject) => {
+        if (instance) {
+            instance
+                .compareFaces(Face1, Face2)
+                .then((result) => {
+                    if (!result) {
+                        throw new Error('No result obtained!');
+                    }
+                    console.log(result);
+                    showSuccessAlert(`Result Obtained: ${JSON.stringify(result)}`).then(() => {
+                        resolve(result);
+                    });
+                })
+                .catch((error) => {
+                    showErrorAlert('Compare Faces, unknown error!', error);
+                    reject(error);
+                });
+        } else {
+            reject('Instance not found!');
+        }
+    });
+};
+
+export const detectFaceInImage = async (instance: VerID) => {
+    if (instance) {
+        return instance
+            .detectFaceInImage(FACE_TEST_IMAGE)
+            .then((face: any) => {
+                if (!face) {
+                    throw new Error('Error getting result!');
+                }
+                if (!verifyIfFaceIsCorrect(face)) {
+                    throw new Error('Face object is not valid!');
+                }
+                return face;
+            })
+            .catch((error) => {
+                showErrorAlert('Detect Face in Image, unknown error!', error);
+                throw error;
             });
     }
 };
@@ -144,11 +228,15 @@ export const deleteRegisteredUser = async (instance: VerID, userID: string) => {
                     showSuccessAlert(`Delete of ${userID} Completed!`);
                 } else {
                     showErrorAlert('Error deleting user!', response.error);
+                    throw new Error('Error deleting user!');
                 }
-                return response;
             })
             .catch((error: any) => {
                 showErrorAlert('Delete User, unknown error!', error);
+                throw error;
             });
+    } else {
+        showErrorAlert('Error, instance not found!');
+        throw new Error('Error, instance not found!');
     }
 };
