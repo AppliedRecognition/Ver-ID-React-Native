@@ -5,11 +5,12 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.util.Base64
 import android.util.Base64InputStream
-import com.appliedrec.verid.core.*
-import com.appliedrec.verid.core.RecognizableFace
-import com.appliedrec.verid.core.RegistrationSessionSettings
-import com.appliedrec.verid.ui.VerIDSessionActivity
-import com.appliedrec.verid.ui.VerIDSessionIntent
+import androidx.exifinterface.media.ExifInterface
+import com.appliedrec.verid.core2.*
+import com.appliedrec.verid.core2.session.*
+import com.appliedrec.verid.ui2.AbstractVerIDSession
+import com.appliedrec.verid.ui2.VerIDSession
+import com.appliedrec.verid.ui2.VerIDSessionDelegate
 import com.facebook.react.bridge.*
 import com.google.gson.Gson
 import com.google.gson.JsonObject
@@ -25,12 +26,6 @@ class ReactNativePluginVerIdModule(var mContext: ReactApplicationContext): React
     protected var TESTING_MODE = false
     protected var verID: VerID? = null
     private var promiseCallback: Promise? = null
-
-    override fun initialize() {
-        super.initialize()
-
-        mContext.addActivityEventListener(mActivityEventListener);
-    }
 
     override fun getName(): String {
         return "ReactNativePluginVerId"
@@ -87,12 +82,8 @@ class ReactNativePluginVerIdModule(var mContext: ReactApplicationContext): React
                     promiseCallback = promise
                     val jsonSettings = args.getMap(0)?.getString("settings")
                     val gson = Gson()
-                    var settings: RegistrationSessionSettings = gson.fromJson(jsonSettings, RegistrationSessionSettings::class.java)
-                    loadVerIDAndStartActivity(null, promise, object : IntentFactory {
-                        override fun createIntent(): Intent? {
-                            return VerIDSessionIntent<VerIDSessionSettings>(mContext.currentActivity, verID, settings)
-                        }
-                    }, REQUEST_CODE_REGISTER)
+                    val settings: RegistrationSessionSettings = gson.fromJson(jsonSettings, RegistrationSessionSettings::class.java)
+                    loadVerIDAndStartSession(null, promise, settings)
                 } catch (error: Exception) {
                     promise.reject(error)
                 }
@@ -110,12 +101,8 @@ class ReactNativePluginVerIdModule(var mContext: ReactApplicationContext): React
                     promiseCallback = promise
                     val jsonSettings = args.getMap(0)?.getString("settings")
                     val gson = Gson()
-                    var settings: AuthenticationSessionSettings = gson.fromJson(jsonSettings, AuthenticationSessionSettings::class.java)
-                    loadVerIDAndStartActivity(null, promise, object : IntentFactory {
-                        override fun createIntent(): Intent? {
-                            return VerIDSessionIntent<VerIDSessionSettings>(mContext.currentActivity, verID, settings)
-                        }
-                    }, REQUEST_CODE_AUTHENTICATE)
+                    val settings: AuthenticationSessionSettings = gson.fromJson(jsonSettings, AuthenticationSessionSettings::class.java)
+                    loadVerIDAndStartSession(null, promise, settings)
                 } catch (error: Exception) {
                     promise.reject(error)
                 }
@@ -133,12 +120,8 @@ class ReactNativePluginVerIdModule(var mContext: ReactApplicationContext): React
                     promiseCallback = promise
                     val jsonSettings = args.getMap(0)?.getString("settings")
                     val gson = Gson()
-                    var settings: LivenessDetectionSessionSettings = gson.fromJson(jsonSettings, LivenessDetectionSessionSettings::class.java)
-                    loadVerIDAndStartActivity(null, promise, object : IntentFactory {
-                        override fun createIntent(): Intent? {
-                            return VerIDSessionIntent<VerIDSessionSettings>(mContext.currentActivity, verID, settings)
-                        }
-                    }, REQUEST_CODE_DETECT_LIVENESS)
+                    val settings: LivenessDetectionSessionSettings = gson.fromJson(jsonSettings, LivenessDetectionSessionSettings::class.java)
+                    loadVerIDAndStartSession(null, promise, settings)
                 } catch (error: Exception) {
                     promise.reject(error)
                 }
@@ -238,8 +221,8 @@ class ReactNativePluginVerIdModule(var mContext: ReactApplicationContext): React
                     val base64InputStream = Base64InputStream(inputStream, Base64.NO_WRAP)
                     val bitmap = BitmapFactory.decodeStream(base64InputStream)
                             ?: throw Exception("Bitmap decoding error")
-                    val verIDImage = VerIDImage(bitmap)
-                    val faces = verID!!.faceDetection.detectFacesInImage(verIDImage, 1, 0)
+                    val verIDImage = VerIDImageBitmap(bitmap, ExifInterface.ORIENTATION_NORMAL)
+                    val faces = verID!!.getFaceDetection<FaceDetectionImage>().detectFacesInImage(verIDImage.createFaceDetectionImage(), 1, 0)
 
                     if (faces.isEmpty()) {
                         throw Exception("Face not found")
@@ -256,23 +239,18 @@ class ReactNativePluginVerIdModule(var mContext: ReactApplicationContext): React
         })
     }
 
-    protected interface IntentFactory {
-        fun createIntent(): Intent?
-    }
-
     protected fun loadVerIDAndRun(password: String?, promise: Promise, runnable: Runnable) {
         if (verID != null) {
             runnable.run()
         } else {
             val verIDFactory = VerIDFactory(mContext, object : VerIDFactoryDelegate {
-                override fun veridFactoryDidCreateEnvironment(verIDFactory: VerIDFactory, instance: VerID) {
-                    println("veridFactoryDidCreateEnvironment")
-                    verID = instance
+
+                override fun onVerIDCreated(verIDFactory: VerIDFactory?, verID: VerID?) {
+                    this@ReactNativePluginVerIdModule.verID = verID
                     runnable.run()
                 }
 
-                override fun veridFactoryDidFailWithException(verIDFactory: VerIDFactory, e: Exception) {
-                    println("veridFactoryDidFailWithException")
+                override fun onVerIDCreationFailed(verIDFactory: VerIDFactory?, e: java.lang.Exception?) {
                     promise.reject(e)
                 }
             })
@@ -286,62 +264,16 @@ class ReactNativePluginVerIdModule(var mContext: ReactApplicationContext): React
         }
     }
 
-    protected fun loadVerIDAndStartActivity(password: String?, promise: Promise, intentFactory: IntentFactory, requestCode: Int) {
+    protected fun loadVerIDAndStartSession(password: String?, promise: Promise, settings: VerIDSessionSettings) {
         loadVerIDAndRun(password, promise, Runnable {
-            val activity: Activity? = mContext.currentActivity
-            if (activity == null) {
-                promise.reject("1", "Cordova activity is null")
+            if (verID == null) {
+                promise.reject(java.lang.Exception("Ver-ID is null"))
                 return@Runnable
             }
-            if (activity.isDestroyed) {
-                promise.reject("1", "Activity is destroyed")
-                return@Runnable
-            }
-            promiseCallback = promise
-            activity.startActivityForResult(intentFactory.createIntent(), requestCode)
+            val session: VerIDSession<out VerIDSessionSettings> = VerIDSession(verID!!, settings)
+            session.setDelegate(SessionDelegate(promise))
+            session.start()
         })
-    }
-
-    private val mActivityEventListener: ActivityEventListener = object : BaseActivityEventListener() {
-        override fun onActivityResult(activity: Activity?, requestCode: Int, resultCode: Int, data: Intent?) {
-
-            println("[onActivityResult] requestCode $requestCode, resultCode $resultCode")
-            if (promiseCallback != null && (requestCode == REQUEST_CODE_REGISTER || requestCode == REQUEST_CODE_AUTHENTICATE || requestCode == REQUEST_CODE_DETECT_LIVENESS)) {
-                val activity = mContext.currentActivity
-                runBlocking {
-
-                    async {
-                        val gson = Gson()
-                        val result: VerIDSessionResult? = if (resultCode == Activity.RESULT_OK && data != null) {
-                            data.getParcelableExtra(VerIDSessionActivity.EXTRA_RESULT)
-                        } else if (resultCode == Activity.RESULT_CANCELED) {
-                            null
-                        } else {
-                            VerIDSessionResult(Exception("Unknown failure"))
-                        }
-
-                        val response = gson.toJson(result, VerIDSessionResult::class.java)
-                        if (promiseCallback != null) {
-                            if (activity != null) {
-                                if (activity.isDestroyed) {
-                                    promiseCallback!!.reject(Error("Activity is destroyed"))
-                                } else {
-                                    promiseCallback!!.resolve(response)
-                                    promiseCallback = null
-                                }
-                            } else {
-                                promiseCallback!!.reject(Error("Activity is null"))
-                            }
-
-                        } else {
-                            throw Error("Promise Callback is null")
-                        }
-                    }
-
-                }
-
-            }
-        }
     }
 }
 
@@ -367,4 +299,22 @@ class Mockups {
             return faceMockup;
         }
     }
+}
+
+class SessionDelegate: VerIDSessionDelegate {
+
+    val promise: Promise
+
+    constructor(promise: Promise) {
+        this.promise = promise
+    }
+
+    override fun onSessionFinished(session: AbstractVerIDSession<*, *, *>?, result: VerIDSessionResult?) {
+        promise.resolve(result)
+    }
+
+    override fun onSessionCanceled(session: AbstractVerIDSession<*, *, *>?) {
+        promise.resolve(null)
+    }
+
 }
